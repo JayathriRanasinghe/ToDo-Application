@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'Services/local_notification.dart';
+
 class ViewAllTasks extends StatefulWidget {
   //List taskData =[]; 
   ViewAllTasks({super.key});
@@ -68,8 +70,12 @@ class _ViewAllTasksState extends State<ViewAllTasks> with TickerProviderStateMix
               trailing: IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: (){
+                  String task_name = readDataName(index);
                   deleteData(index);
                   Navigator.pushNamed(context, '/view');
+                  NotificationService()
+              .showNotification(title: 'A task removed', body: 'Task: \''+task_name+'\' removed successfully');
+                
                 },
               ),
               title: Text('$taskName | $message: $days days $hours h $minutes min'),

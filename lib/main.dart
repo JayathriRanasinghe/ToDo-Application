@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/head.dart';
 
+import 'Services/local_notification.dart';
+
 void main() async {
   await Hive.initFlutter();
-
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationService().initNotification();
   var box = await Hive.openBox('NewToDoBox');
   //box.deleteFromDisk();
   runApp(const MyApp());

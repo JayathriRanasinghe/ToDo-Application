@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/allTasks.dart';
 
+import 'Services/local_notification.dart';
+
 //import 'package:medicarenew/forgot_password.dart';
 //import 'package:medicarenew/navigation.dart';
 //import 'package:medicarenew/sign_up.dart';
@@ -173,7 +175,41 @@ class _AddTaskState extends State<AddTask> {
                           "date": selectedDate.toLocal().toString().split(' ')[0],
                           "time": selectedTime.format(context)
                         };
+                        String? date = data["date"];
+                        String? time = data["time"];
+                        String? task_name = data["task"];
+                        
+                        DateTime dt1 = DateTime.parse("$date $time:00");
+                        DateTime dt2 = DateTime.now();
+                        
+                        Duration diff = dt1.difference(dt2);
+                        
+                        int min = (diff.inSeconds / 60).round();
+                        
+                        String message = "";
                         writeData(data);
+
+                        if(diff.inSeconds >= 900 && diff.inSeconds < 3600){ //in less than one hour and more than 15 min
+                          DateTime dt4 = dt1.subtract(const Duration(minutes: 10));
+                          message = '${task_name} is due in 10 minutes';
+                          NotificationService().scheduleNotifications(id:0,title:'Reminder',body: message, time: dt4);
+                        
+                        }else if(diff.inSeconds >= 3600 && diff.inSeconds < 7200){
+                          DateTime dt4 = dt1.subtract(const Duration(minutes: 30));
+                          message = '${task_name} is due in 30 minutes';
+                          NotificationService().scheduleNotifications(id:0,title:'Reminder',body: message, time: dt4);
+                        
+                        }else if(diff.inSeconds >= 7200){
+                          DateTime dt4 = dt1.subtract(const Duration(hours: 1));
+                          message = '${task_name} is due in 1 hours';
+                          NotificationService().scheduleNotifications(id:0,title:'Reminder',body: message, time: dt4);
+                        
+                        }else{ //in less than 15 min
+                          NotificationService()
+              .showNotification(title: 'New task added', body: 'Task: \'$task_name\' should be completed within $min');
+                        }
+                        
+                        
                         Navigator.pushNamed(context, '/view');
                         
                       },
